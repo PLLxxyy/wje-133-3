@@ -8,32 +8,43 @@ interface AnnotationMarkerProps {
   onClick?: () => void;
 }
 
-const iconByType = {
+const iconByType: Record<AnnotationType, React.ComponentType<{ className?: string }>> = {
   [AnnotationType.Issue]: AlertTriangle,
   [AnnotationType.Description]: FileText,
   [AnnotationType.Change]: GitCommitVertical
 };
 
-const labelByType = {
+const labelByType: Record<AnnotationType, string> = {
   [AnnotationType.Issue]: '问题',
   [AnnotationType.Description]: '说明',
   [AnnotationType.Change]: '变更'
 };
 
-const labelByStatus = {
+const labelByStatus: Record<AnnotationStatus, string> = {
   [AnnotationStatus.Pending]: '待处理',
   [AnnotationStatus.InProgress]: '处理中',
   [AnnotationStatus.Resolved]: '已解决'
 };
 
-const colorByStatus = {
+const colorByStatus: Record<AnnotationStatus, string> = {
   [AnnotationStatus.Pending]: '#c18a3d',
   [AnnotationStatus.InProgress]: '#4a7db8',
   [AnnotationStatus.Resolved]: '#4f8f6f'
 };
 
+function resolveStatus(status: AnnotationStatus | undefined): AnnotationStatus {
+  switch (status) {
+    case AnnotationStatus.InProgress:
+    case AnnotationStatus.Resolved:
+      return status;
+    default:
+      return AnnotationStatus.Pending;
+  }
+}
+
 export function AnnotationMarker({ annotation, compact = false, onClick }: AnnotationMarkerProps) {
   const Icon = iconByType[annotation.type];
+  const status = resolveStatus(annotation.status);
 
   return (
     <button
@@ -54,9 +65,9 @@ export function AnnotationMarker({ annotation, compact = false, onClick }: Annot
           </span>
           <span
             className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
-            style={{ background: colorByStatus[annotation.status] }}
+            style={{ background: colorByStatus[status] }}
           >
-            {labelByStatus[annotation.status]}
+            {labelByStatus[status]}
           </span>
         </span>
         <span

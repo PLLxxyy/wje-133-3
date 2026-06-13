@@ -10,19 +10,29 @@ interface AnnotationEditModalProps {
   isCreating?: boolean;
 }
 
-const labelByType = {
+const labelByType: Record<AnnotationType, string> = {
   [AnnotationType.Issue]: '问题',
   [AnnotationType.Description]: '说明',
   [AnnotationType.Change]: '变更'
 };
 
-const labelByStatus = {
+const labelByStatus: Record<AnnotationStatus, string> = {
   [AnnotationStatus.Pending]: '待处理',
   [AnnotationStatus.InProgress]: '处理中',
   [AnnotationStatus.Resolved]: '已解决'
 };
 
-const statusOptions = [
+function resolveStatus(status: AnnotationStatus | undefined): AnnotationStatus {
+  switch (status) {
+    case AnnotationStatus.InProgress:
+    case AnnotationStatus.Resolved:
+      return status;
+    default:
+      return AnnotationStatus.Pending;
+  }
+}
+
+const statusOptions: Array<{ value: AnnotationStatus; label: string; color: string }> = [
   { value: AnnotationStatus.Pending, label: labelByStatus[AnnotationStatus.Pending], color: '#c18a3d' },
   { value: AnnotationStatus.InProgress, label: labelByStatus[AnnotationStatus.InProgress], color: '#4a7db8' },
   { value: AnnotationStatus.Resolved, label: labelByStatus[AnnotationStatus.Resolved], color: '#4f8f6f' }
@@ -40,7 +50,7 @@ export function AnnotationEditModal({
   useEffect(() => {
     if (annotation) {
       setContent(annotation.content);
-      setStatus(annotation.status);
+      setStatus(resolveStatus(annotation.status));
     } else {
       setContent('');
       setStatus(AnnotationStatus.Pending);
