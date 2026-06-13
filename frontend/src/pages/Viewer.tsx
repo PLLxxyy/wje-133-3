@@ -1,7 +1,9 @@
-import { Layers3, MessageSquare, PanelRight, Scissors } from 'lucide-react';
+import { useState } from 'react';
+import { Edit2, Layers3, MessageSquare, PanelRight, Scissors } from 'lucide-react';
 import { LayerTree } from '../components/common/LayerTree';
 import { PropertyPanel } from '../components/common/PropertyPanel';
 import { AnnotationMarker } from '../components/common/AnnotationMarker';
+import { AnnotationEditModal } from '../components/common/AnnotationEditModal';
 import { SceneContainer } from '../components/scene/SceneContainer';
 import { useAnnotationStore } from '../stores/annotationStore';
 import { useElementStore } from '../stores/elementStore';
@@ -9,18 +11,31 @@ import { useLayerStore } from '../stores/layerStore';
 import { useSectionStore } from '../stores/sectionStore';
 import { useThemeStore } from '../stores/themeStore';
 import { useViewpointStore } from '../stores/viewpointStore';
+import type { Annotation } from '../types';
+import type { AnnotationStatus } from '../types/enums';
 
 export function Viewer() {
   const { layers, focusedLayerId, toggleVisibility, setOpacity, focusLayer } = useLayerStore();
   const { elements, selectedElementId, selectElement } = useElementStore();
-  const { annotations } = useAnnotationStore();
+  const { annotations, updateAnnotation } = useAnnotationStore();
   const { sections } = useSectionStore();
   const { theme } = useThemeStore();
   const { viewpoints, activeViewpointId } = useViewpointStore();
+  const [editingAnnotation, setEditingAnnotation] = useState<Annotation | null>(null);
   const selectedElement = elements.find((element) => element.id === selectedElementId) ?? null;
   const selectedLayer = layers.find((layer) => layer.id === selectedElement?.layerId);
   const activeViewpoint = viewpoints.find((viewpoint) => viewpoint.id === activeViewpointId);
   const activeSections = sections.filter((section) => section.active);
+
+  const handleEdit = (annotation: Annotation, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingAnnotation(annotation);
+  };
+
+  const handleSave = (id: string, content: string, status: AnnotationStatus) => {
+    updateAnnotation(id, content, status);
+    setEditingAnnotation(null);
+  };
 
   return (
     <div className="viewer-grid">
@@ -67,12 +82,21 @@ export function Viewer() {
         />
         <div className="mt-4 grid gap-3 lg:grid-cols-3">
           {annotations.map((annotation) => (
-            <AnnotationMarker
-              key={annotation.id}
-              annotation={annotation}
-              compact
-              onClick={() => selectElement(annotation.elementId)}
-            />
+            <div key={annotation.id} className="group relative">
+              <AnnotationMarker
+                annotation={annotation}
+                compact
+                onClick={() => selectElement(annotation.elementId)}
+              />
+              <button
+                className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center border border-[color:var(--border)] bg-[color:var(--surface)] opacity-0 transition group-hover:opacity-100"
+                onClick={(e) => handleEdit(annotation, e)}
+                type="button"
+                title="编辑标注"
+              >
+                <Edit2 className="h-3.5 w-3.5 text-[color:var(--accent)]" />
+              </button>
+            </div>
           ))}
         </div>
       </section>
@@ -84,6 +108,12 @@ export function Viewer() {
         </div>
         <PropertyPanel element={selectedElement} layer={selectedLayer} />
       </section>
+
+      <AnnotationEditModal
+        annotation={editingAnnotation}
+        onClose={() => setEditingAnnotation(null)}
+        onSave={handleSave}
+      />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { AlertTriangle, FileText, GitCommitVertical } from 'lucide-react';
-import { AnnotationType } from '../../types/enums';
+import { AnnotationType, AnnotationStatus } from '../../types/enums';
 import type { Annotation } from '../../types';
 
 interface AnnotationMarkerProps {
@@ -20,6 +20,18 @@ const labelByType = {
   [AnnotationType.Change]: '变更'
 };
 
+const labelByStatus = {
+  [AnnotationStatus.Pending]: '待处理',
+  [AnnotationStatus.InProgress]: '处理中',
+  [AnnotationStatus.Resolved]: '已解决'
+};
+
+const colorByStatus = {
+  [AnnotationStatus.Pending]: '#c18a3d',
+  [AnnotationStatus.InProgress]: '#4a7db8',
+  [AnnotationStatus.Resolved]: '#4f8f6f'
+};
+
 export function AnnotationMarker({ annotation, compact = false, onClick }: AnnotationMarkerProps) {
   const Icon = iconByType[annotation.type];
 
@@ -35,9 +47,17 @@ export function AnnotationMarker({ annotation, compact = false, onClick }: Annot
       >
         <Icon className="h-4 w-4 text-white" aria-hidden="true" />
       </span>
-      <span className="min-w-0">
-        <span className="block text-xs font-semibold text-[color:var(--text-muted)]">
-          {labelByType[annotation.type]} · {annotation.author}
+      <span className="min-w-0 flex-1">
+        <span className="flex items-center gap-2">
+          <span className="text-xs font-semibold text-[color:var(--text-muted)]">
+            {labelByType[annotation.type]} · {annotation.author}
+          </span>
+          <span
+            className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
+            style={{ background: colorByStatus[annotation.status] }}
+          >
+            {labelByStatus[annotation.status]}
+          </span>
         </span>
         <span
           className={

@@ -1,4 +1,4 @@
-import { AnnotationType } from './enums';
+import { AnnotationType, AnnotationStatus } from './enums';
 import type { Vector3Tuple } from './element';
 
 export interface Annotation {
@@ -7,6 +7,7 @@ export interface Annotation {
   worldPosition: Vector3Tuple;
   content: string;
   type: AnnotationType;
+  status: AnnotationStatus;
   color: string;
   author: string;
   createdAt: string;

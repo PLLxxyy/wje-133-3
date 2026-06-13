@@ -76,6 +76,18 @@ frontend/src/
 - `frontend/src/components/scene/AnnotationBillboard.tsx`：3D 标注 Billboard 短标识映射。
 - `frontend/src/pages/AnnotationManage.tsx`：标注筛选按钮和新增标注类型。
 
+### AnnotationStatus
+
+- `frontend/src/types/enums.ts`：枚举定义（Pending/InProgress/Resolved）。
+- `frontend/src/types/annotation.ts`：`Annotation.status` 字段类型。
+- `frontend/src/api/mockData.ts`：模拟标注数据状态赋值。
+- `frontend/src/stores/annotationStore.ts`：`updateAnnotation` 支持状态更新。
+- `frontend/src/components/common/AnnotationMarker.tsx`：标注列表状态标签显示。
+- `frontend/src/components/common/AnnotationEditModal.tsx`：编辑弹窗状态选择。
+- `frontend/src/components/scene/AnnotationBillboard.tsx`：3D 标注状态角点显示。
+- `frontend/src/pages/AnnotationManage.tsx`：新增/编辑标注状态选择。
+- `frontend/src/pages/Viewer.tsx`：主视图标注编辑状态更新。
+
 ## License
 
 MIT

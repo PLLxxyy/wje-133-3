@@ -1,9 +1,11 @@
-import { Plus } from 'lucide-react';
+import { useState } from 'react';
+import { Edit2, Plus } from 'lucide-react';
 import { AnnotationMarker } from '../components/common/AnnotationMarker';
+import { AnnotationEditModal } from '../components/common/AnnotationEditModal';
 import { EmptyState } from '../components/common/EmptyState';
 import { useAnnotationStore } from '../stores/annotationStore';
 import { useElementStore } from '../stores/elementStore';
-import { AnnotationType } from '../types/enums';
+import { AnnotationType, AnnotationStatus } from '../types/enums';
 import type { Annotation } from '../types';
 
 const filters: Array<AnnotationType | 'All'> = [
@@ -21,9 +23,11 @@ const filterLabels: Record<AnnotationType | 'All', string> = {
 };
 
 export function AnnotationManage() {
-  const { annotations, filter, setFilter, addAnnotation, deleteAnnotation } =
+  const { annotations, filter, setFilter, addAnnotation, updateAnnotation, deleteAnnotation } =
     useAnnotationStore();
   const { elements, selectElement } = useElementStore();
+  const [editingAnnotation, setEditingAnnotation] = useState<Annotation | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
   const filtered =
     filter === 'All'
       ? annotations
@@ -38,14 +42,40 @@ export function AnnotationManage() {
       id: `ann-${Date.now()}`,
       elementId: element.id,
       worldPosition: element.position,
-      content: '新增协调记录，等待专业负责人确认。',
+      content: '',
       type: AnnotationType.Description,
+      status: AnnotationStatus.Pending,
       color: '#bf8f46',
       author: '审阅员',
       createdAt: new Date().toISOString()
     };
-    addAnnotation(next);
-    selectElement(element.id);
+    setIsCreating(true);
+    setEditingAnnotation(next);
+  };
+
+  const handleEdit = (annotation: Annotation) => {
+    setIsCreating(false);
+    setEditingAnnotation(annotation);
+  };
+
+  const handleSave = (id: string, content: string, status: AnnotationStatus) => {
+    if (isCreating) {
+      const newAnnotation = {
+        ...editingAnnotation!,
+        content,
+        status
+      };
+      addAnnotation(newAnnotation);
+      selectElement(newAnnotation.elementId);
+    } else {
+      updateAnnotation(id, content, status);
+    }
+    setEditingAnnotation(null);
+  };
+
+  const handleClose = () => {
+    setEditingAnnotation(null);
+    setIsCreating(false);
   };
 
   return (
@@ -90,19 +120,36 @@ export function AnnotationManage() {
                   <span className="text-[color:var(--text-muted)]">
                     关联：{element?.name ?? annotation.elementId}
                   </span>
-                  <button
-                    className="text-sm font-semibold text-[color:var(--danger)]"
-                    onClick={() => deleteAnnotation(annotation.id)}
-                    type="button"
-                  >
-                    删除
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      className="text-sm font-semibold text-[color:var(--accent)]"
+                      onClick={() => handleEdit(annotation)}
+                      type="button"
+                    >
+                      <Edit2 className="mr-1 inline h-3.5 w-3.5" />
+                      编辑
+                    </button>
+                    <button
+                      className="text-sm font-semibold text-[color:var(--danger)]"
+                      onClick={() => deleteAnnotation(annotation.id)}
+                      type="button"
+                    >
+                      删除
+                    </button>
+                  </div>
                 </div>
               </article>
             );
           })}
         </div>
       )}
+
+      <AnnotationEditModal
+        annotation={editingAnnotation}
+        onClose={handleClose}
+        onSave={handleSave}
+        isCreating={isCreating}
+      />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { AnnotationType, ElementType } from '../types/enums';
+import { AnnotationType, AnnotationStatus, ElementType } from '../types/enums';
 import type {
   Annotation,
   BuildingElement,
@@ -220,6 +220,7 @@ export const annotations: Annotation[] = [
     worldPosition: { x: -4.6, y: 1.1, z: -5.45 },
     content: '防水节点与施工图 A-203 详图不一致',
     type: AnnotationType.Issue,
+    status: AnnotationStatus.InProgress,
     color: '#d7564b',
     author: '结构审阅组',
     createdAt: '2026-06-12T10:15:00+08:00'
@@ -230,6 +231,7 @@ export const annotations: Annotation[] = [
     worldPosition: { x: 7.55, y: 2.7, z: 1.4 },
     content: '窗组开启扇数量已按节能反馈调整',
     type: AnnotationType.Change,
+    status: AnnotationStatus.Resolved,
     color: '#4f8f6f',
     author: '建筑专业',
     createdAt: '2026-06-12T10:28:00+08:00'
@@ -240,6 +242,7 @@ export const annotations: Annotation[] = [
     worldPosition: { x: 7.1, y: 6.62, z: -1.6 },
     content: '连梁底标高需与机电桥架净高联合复核',
     type: AnnotationType.Description,
+    status: AnnotationStatus.Pending,
     color: '#c18a3d',
     author: 'BIM 协调员',
     createdAt: '2026-06-12T10:42:00+08:00'

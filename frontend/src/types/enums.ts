@@ -14,4 +14,10 @@ export enum AnnotationType {
   Change = 'Change'
 }
 
+export enum AnnotationStatus {
+  Pending = 'Pending',
+  InProgress = 'InProgress',
+  Resolved = 'Resolved'
+}
+
 export type ThemeMode = 'light' | 'dark';
